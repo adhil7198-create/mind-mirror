@@ -1,18 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-teal: #76b5c5;
-  --primary-teal-light: #8ec3d0;
-  --primary-teal-dark: #5ea0b0;
-  --soft-lavender: #e2d1f9;
-  --warm-coral: #ff8b94;
-  --warm-yellow: #f9d99a;
-  --text-dark: #2d3436;
-  --text-muted: #636e72;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  /* Healing Garden Palette */
+  --primary-teal: #87a3a3;
+  /* Calm Sage */
+  --primary-teal-light: #a9bcbc;
+  --primary-teal-dark: #6b8a8a;
+  --soft-lavender: #d4d9e2;
+  /* Muted Blue-Grey */
+  --warm-coral: #d4a39d;
+  /* Dusky Rose */
+  --warm-yellow: #e8dcc4;
+  /* Warm Sand */
+  --text-dark: #3a4747;
+  /* Grounded Slate */
+  --text-muted: #718096;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --shadow: 0 12px 40px rgba(135, 163, 163, 0.1);
+  --bg-gradient: linear-gradient(135deg, #f7f9f9 0%, #ebeef0 100%);
   --accent-gradient: linear-gradient(135deg, var(--primary-teal), var(--soft-lavender));
 }
 
