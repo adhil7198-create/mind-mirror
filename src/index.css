@@ -29,6 +29,8 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  /* Mobile optimization */
 }
 
 h1,
@@ -39,6 +41,7 @@ h5 {
   font-family: 'Outfit', sans-serif;
   font-weight: 600;
   letter-spacing: -0.02em;
+  word-wrap: break-word;
 }
 
 /* Glassmorphism Utility */
@@ -140,13 +143,27 @@ h5 {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
+  /* Reduced from 24px for tighter mobile feels */
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 24px;
+  }
 }
 
 .hero-section {
-  padding: 100px 0 60px;
+  padding: 60px 0 40px;
+  /* Reduced from 100px */
   text-align: center;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 100px 0 60px;
+  }
 }
 
 .badge {
@@ -200,12 +217,23 @@ h5 {
 
 /* ChatInterface */
 .chat-container {
-  height: 600px;
-  max-width: 42rem;
+  height: 85vh;
+  /* Responsive height */
+  max-height: 700px;
+  width: 100%;
   margin: 0 auto;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 0;
+  /* Full screen on mobile */
+}
+
+@media (min-width: 640px) {
+  .chat-container {
+    height: 600px;
+    border-radius: 24px;
+  }
 }
 
 .chat-messages {
