@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import SafetyPopup from './components/SafetyPopup';
 import ChatInterface from './components/ChatInterface';
 import Dashboard from './components/Dashboard';
-import { Sparkles, Brain, Heart, ArrowRight, ShieldCheck, Github, Activity, LogOut, User, X } from 'lucide-react';
+import History from './components/History';
+import SettingsComp from './components/Settings';
+import { Sparkles, Brain, Heart, ArrowRight, ShieldCheck, Github, Activity, LogOut, User, X, Clock, Settings } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 const App = () => {
@@ -44,6 +46,7 @@ const App = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setCurrentView('landing');
   };
 
   const startAssessment = () => setCurrentView('assessment');
@@ -74,19 +77,34 @@ const App = () => {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#" className="text-gray-600 hover:text-[var(--primary-teal)] font-medium transition-colors">How it Works</a>
-            <a href="#" className="text-gray-600 hover:text-[var(--primary-teal)] font-medium transition-colors">For Professionals</a>
+
             {session ? (
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-slate-700">
-                  <User size={18} />
-                  <span className="text-sm font-semibold">{session.user.email.split('@')[0]}</span>
-                </div>
-                <button className="btn btn-secondary border-none" onClick={handleLogout}>
-                  <LogOut size={18} />
+              <>
+                <button
+                  onClick={() => setCurrentView('history')}
+                  className={`flex items-center gap-2 font-medium transition-colors ${currentView === 'history' ? 'text-[var(--primary-teal)] font-bold' : 'text-slate-600 hover:text-[var(--primary-teal)]'}`}
+                >
+                  <Clock size={16} /> History
                 </button>
-              </div>
+                <div className="h-6 w-px bg-slate-200"></div>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setCurrentView('settings')}
+                    className={`flex items-center gap-2 font-medium transition-colors ${currentView === 'settings' ? 'text-[var(--primary-teal)] font-bold' : 'text-slate-600 hover:text-[var(--primary-teal)]'}`}
+                  >
+                    <Settings size={18} />
+                    <span className="text-sm font-semibold">{session.user.email.split('@')[0]}</span>
+                  </button>
+                  <button className="btn btn-secondary border-none" onClick={handleLogout}>
+                    <LogOut size={18} />
+                  </button>
+                </div>
+              </>
             ) : (
-              <button className="btn btn-primary" onClick={handleAuthModal}>Login</button>
+              <>
+                <a href="#" className="text-gray-600 hover:text-[var(--primary-teal)] font-medium transition-colors">For Professionals</a>
+                <button className="btn btn-primary" onClick={handleAuthModal}>Login</button>
+              </>
             )}
           </div>
 
@@ -107,15 +125,27 @@ const App = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden glass rounded-none border-t border-white/20 bg-white/95 animate-fade-in p-6 space-y-6">
             <div className="flex flex-col gap-4">
+              <button
+                onClick={() => { setCurrentView('landing'); setIsMobileMenuOpen(false); }}
+                className="text-lg font-medium text-slate-700 p-2 text-left"
+              >Home</button>
               <a href="#" className="text-lg font-medium text-slate-700 p-2">How it Works</a>
-              <a href="#" className="text-lg font-medium text-slate-700 p-2">For Professionals</a>
+
               {session ? (
                 <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">
-                  <div className="flex items-center gap-2 text-slate-700 px-2">
-                    <User size={18} />
-                    <span className="font-semibold">{session.user.email}</span>
-                  </div>
-                  <button className="btn btn-secondary w-full justify-start" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
+                  <button
+                    onClick={() => { setCurrentView('history'); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 text-lg font-medium text-slate-700 p-2"
+                  >
+                    <Clock size={20} /> History
+                  </button>
+                  <button
+                    onClick={() => { setCurrentView('settings'); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 text-lg font-medium text-slate-700 p-2"
+                  >
+                    <Settings size={20} /> Settings
+                  </button>
+                  <button className="btn btn-secondary w-full justify-start mt-4" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
                     <LogOut size={18} className="mr-2" /> Logout
                   </button>
                 </div>
@@ -204,6 +234,18 @@ const App = () => {
         {currentView === 'results' && assessmentAnswers && (
           <div className="container py-10 px-6">
             <Dashboard answers={assessmentAnswers} session={session} onLogin={handleAuthModal} />
+          </div>
+        )}
+
+        {currentView === 'history' && session && (
+          <div className="container py-10 px-6">
+            <History session={session} />
+          </div>
+        )}
+
+        {currentView === 'settings' && session && (
+          <div className="container py-10 px-6">
+            <SettingsComp session={session} onLogout={handleLogout} />
           </div>
         )}
       </main>
