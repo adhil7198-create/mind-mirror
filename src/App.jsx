@@ -12,10 +12,13 @@ const App = () => {
   const [assessmentAnswers, setAssessmentAnswers] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [message, setMessage] = useState('');
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
+  const [showOtpInput, setShowOtpInput] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -35,11 +38,44 @@ const App = () => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    const { error } = await supabase.auth.signInWithOtp({ email });
+
+    if (loginMethod === 'email') {
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) {
+        setMessage(error.message);
+      } else {
+        setMessage('Check your email for the login link!');
+      }
+    } else {
+      // Phone Login
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phone.startsWith('+') ? phone : `+91${phone}` // Default to +91 if not provided
+      });
+      if (error) {
+        setMessage(error.message);
+      } else {
+        setShowOtpInput(true);
+        setMessage('OTP sent to your phone!');
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    const { error } = await supabase.auth.verifyOtp({
+      phone: phone.startsWith('+') ? phone : `+91${phone}`,
+      token: otpCode,
+      type: 'sms'
+    });
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage('Check your email for the login link!');
+      setIsAuthModalOpen(false);
+      setShowOtpInput(false);
+      setMessage('');
     }
     setLoading(false);
   };
@@ -56,7 +92,12 @@ const App = () => {
     setCurrentView('results');
   };
 
-  const handleAuthModal = () => setIsAuthModalOpen(true);
+  const handleAuthModal = () => {
+    setIsAuthModalOpen(true);
+    setMessage('');
+    setShowOtpInput(false);
+    setOtpCode('');
+  };
 
   return (
     <div className="min-h-screen transition-all duration-700">
@@ -267,45 +308,106 @@ const App = () => {
 
       {isAuthModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="glass max-w-md w-full p-8 flex flex-col gap-8 bg-white/95">
+          <div className="glass max-w-md w-full p-8 flex flex-col gap-6 bg-white/95">
             <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-bold">Welcome Back</h2>
+              <h2 className="text-3xl font-bold">{showOtpInput ? 'Verify OTP' : 'Welcome Back'}</h2>
               <button
-                onClick={() => setIsAuthModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => { setIsAuthModalOpen(false); setShowOtpInput(false); }}
+                className="text-gray-400 hover:text-gray-600 p-2"
               >✕</button>
             </div>
 
-            {message ? (
-              <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center">
+            {message && !showOtpInput && (
+              <div className="p-4 bg-slate-50 border border-slate-100 text-slate-600 rounded-xl text-center text-sm font-medium">
                 {message}
               </div>
+            )}
+
+            {showOtpInput ? (
+              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+                <p className="text-slate-500 text-sm text-center">Enter the 6-digit code sent to <br /><span className="font-bold text-slate-900">{phone}</span></p>
+                <input
+                  type="text"
+                  placeholder="000000"
+                  className="input-field text-center text-2xl tracking-[1em] font-black"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+                <button className="btn btn-primary w-full py-4 text-xl" disabled={loading}>
+                  {loading ? 'Verifying...' : 'Verify & Continue'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowOtpInput(false)}
+                  className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  Edit phone number
+                </button>
+              </form>
             ) : (
               <>
+                <div className="flex p-1 bg-slate-100 rounded-2xl">
+                  <button
+                    onClick={() => setLoginMethod('email')}
+                    className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMethod === 'email' ? 'bg-white shadow-sm text-[var(--primary-teal)]' : 'text-slate-400 hover:text-slate-600'}`}
+                  >Email</button>
+                  <button
+                    onClick={() => setLoginMethod('phone')}
+                    className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMethod === 'phone' ? 'bg-white shadow-sm text-[var(--primary-teal)]' : 'text-slate-400 hover:text-slate-600'}`}
+                  >Phone</button>
+                </div>
+
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="input-field"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  {loginMethod === 'email' ? (
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        className="input-field pl-12"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                      <input
+                        type="tel"
+                        placeholder="+91 XXX-XXX-XXXX"
+                        className="input-field pl-12"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                   <button className="btn btn-primary w-full py-4 text-xl" disabled={loading}>
-                    {loading ? 'Sending...' : 'Send Magic Link'}
+                    {loading ? 'Processing...' : (loginMethod === 'email' ? 'Send Magic Link' : 'Send OTP')}
                   </button>
                 </form>
-                <div className="flex items-center gap-4 py-4">
-                  <div className="flex-1 h-[1px] bg-gray-200"></div>
-                  <span className="text-xs text-gray-400 font-bold">OR LOGIN WITH</span>
-                  <div className="flex-1 h-[1px] bg-gray-200"></div>
+
+                <div className="flex items-center gap-4 py-2">
+                  <div className="flex-1 h-[1px] bg-slate-100"></div>
+                  <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest">Secured by MindMirror</span>
+                  <div className="flex-1 h-[1px] bg-slate-100"></div>
                 </div>
-                <div className="flex gap-4">
-                  <button className="btn btn-secondary flex-1 py-4">Google</button>
-                  <button className="btn btn-secondary flex-1 py-4">Phone</button>
+
+                <div className="flex flex-col gap-3">
+                  <button className="flex items-center justify-center gap-3 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-bold text-slate-600">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
+                    Continue with Google
+                  </button>
                 </div>
               </>
             )}
+
+            <p className="text-center text-[11px] text-slate-400 leading-relaxed">
+              By continuing, you agree to our <span className="underline cursor-pointer">Terms of Service</span> and <br /> <span className="underline cursor-pointer">Clinical Privacy Guidelines</span>.
+            </p>
           </div>
         </div>
       )}
