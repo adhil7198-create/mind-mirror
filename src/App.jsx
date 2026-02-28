@@ -6,6 +6,7 @@ import History from './components/History';
 import SettingsComp from './components/Settings';
 import { Sparkles, Brain, Heart, ArrowRight, ShieldCheck, Github, Activity, LogOut, User, X, Clock, Settings, Mail, Phone } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import heroImage from './assets/hero.png';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('landing');
@@ -229,7 +230,7 @@ const App = () => {
                 <div className="absolute -inset-4 bg-gradient-to-r from-[var(--primary-teal)] to-[var(--soft-lavender)] opacity-10 blur-3xl group-hover:opacity-20 transition-opacity"></div>
                 <div className="glass p-4 rotate-3 group-hover:rotate-0 transition-transform duration-700 relative z-10">
                   <img
-                    src="./src/assets/hero.png"
+                    src={heroImage}
                     alt="Brain Garden"
                     className="w-full rounded-2xl shadow-2xl"
                   />
