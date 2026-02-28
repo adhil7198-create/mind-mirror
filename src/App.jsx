@@ -4,7 +4,7 @@ import ChatInterface from './components/ChatInterface';
 import Dashboard from './components/Dashboard';
 import History from './components/History';
 import SettingsComp from './components/Settings';
-import { Sparkles, Brain, Heart, ArrowRight, ShieldCheck, Github, Activity, LogOut, User, X, Clock, Settings } from 'lucide-react';
+import { Sparkles, Brain, Heart, ArrowRight, ShieldCheck, Github, Activity, LogOut, User, X, Clock, Settings, Mail, Phone } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 const App = () => {
@@ -19,6 +19,7 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [showOtpInput, setShowOtpInput] = useState(false);
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
