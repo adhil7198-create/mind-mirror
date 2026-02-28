@@ -1,24 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Manrope:wght@200..800&display=swap');
 
 :root {
-  /* Healing Garden Palette */
-  --primary-teal: #87a3a3;
-  /* Calm Sage */
-  --primary-teal-light: #a9bcbc;
-  --primary-teal-dark: #6b8a8a;
-  --soft-lavender: #d4d9e2;
-  /* Muted Blue-Grey */
-  --warm-coral: #d4a39d;
-  /* Dusky Rose */
-  --warm-yellow: #e8dcc4;
-  /* Warm Sand */
-  --text-dark: #3a4747;
-  /* Grounded Slate */
-  --text-muted: #718096;
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --shadow: 0 12px 40px rgba(135, 163, 163, 0.1);
-  --bg-gradient: linear-gradient(135deg, #f7f9f9 0%, #ebeef0 100%);
+  /* Healing Garden Palette - Brightened & Clear */
+  --primary-teal: #6b9eac;
+  /* Brighter Calm Teal */
+  --primary-teal-light: #9bc0cb;
+  --primary-teal-dark: #4a7d8a;
+  --soft-lavender: #e2e8f0;
+  /* Clearer Soft Blue */
+  --warm-coral: #ef9a9a;
+  /* Clearer Coral */
+  --warm-yellow: #fff3e0;
+  /* Bright Sand */
+  --text-dark: #2d3748;
+  /* Clearer Slate */
+  --text-muted: #4a5568;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  /* More opaque */
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  --bg-gradient: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
   --accent-gradient: linear-gradient(135deg, var(--primary-teal), var(--soft-lavender));
 }
 
@@ -52,11 +53,12 @@ h5 {
   word-wrap: break-word;
 }
 
-/* Glassmorphism Utility */
+/* Glassmorphism Utility - Bright & Clear */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(4px);
+  /* Reduced for clarity */
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   border-radius: 24px;
