@@ -1,26 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Manrope:wght@200..800&display=swap');
 
 :root {
-  /* Healing Garden Palette - Brightened & Clear */
-  --primary-teal: #6b9eac;
-  /* Brighter Calm Teal */
-  --primary-teal-light: #9bc0cb;
-  --primary-teal-dark: #4a7d8a;
-  --soft-lavender: #e2e8f0;
-  /* Clearer Soft Blue */
-  --warm-coral: #ef9a9a;
-  /* Clearer Coral */
-  --warm-yellow: #fff3e0;
-  /* Bright Sand */
-  --text-dark: #2d3748;
-  /* Clearer Slate */
+  /* High-Clarity Vibrant Palette */
+  --primary-teal: #00b4d8;
+  /* Vibrant Clear Teal */
+  --primary-teal-light: #90e0ef;
+  --primary-teal-dark: #0077b6;
+  --soft-lavender: #f1f5f9;
+  /* Near White */
+  --warm-coral: #ff6b6b;
+  /* Vibrant Coral */
+  --warm-yellow: #fff9db;
+  /* Bright Lemon */
+  --text-dark: #1a202c;
+  /* Deep Contrast Black */
   --text-muted: #4a5568;
-  --glass-bg: rgba(255, 255, 255, 0.95);
-  /* More opaque */
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-  --bg-gradient: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-  --accent-gradient: linear-gradient(135deg, var(--primary-teal), var(--soft-lavender));
+  --glass-bg: #ffffff;
+  /* Solid White for clarity */
+  --glass-border: #e2e8f0;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  --bg-gradient: #ffffff;
+  /* Solid White */
+  --accent-gradient: linear-gradient(135deg, var(--primary-teal), #48cae4);
 }
 
 * {
@@ -53,12 +54,9 @@ h5 {
   word-wrap: break-word;
 }
 
-/* Glassmorphism Utility - Bright & Clear */
+/* High-Clarity Card Utility - No Blur */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(4px);
-  /* Reduced for clarity */
-  -webkit-backdrop-filter: blur(4px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   border-radius: 24px;
@@ -199,7 +197,7 @@ h5 {
 
 /* Component-specific Styles */
 
-/* SafetyPopup */
+/* SafetyPopup - High Contrast */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -211,8 +209,8 @@ h5 {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.7);
+  /* Darker overlay for focus */
 }
 
 .popup-content {
@@ -646,11 +644,11 @@ h5 {
 }
 
 .backdrop-blur-xl {
-  backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .backdrop-blur-sm {
-  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .animate-pulse-slow {
