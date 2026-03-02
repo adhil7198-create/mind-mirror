@@ -2,12 +2,13 @@ import React, { useMemo, useState } from 'react';
 import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
 } from 'recharts';
-import { ShieldCheck, Calendar, Activity, Lock, ArrowRight, UserPlus, Save, CheckCircle } from 'lucide-react';
+import { ShieldCheck, Calendar, Activity, Lock, ArrowRight, UserPlus, Save, CheckCircle, Sparkles, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const Dashboard = ({ answers, session, onLogin }) => {
+const Dashboard = ({ answers, session, onLogin, onViewHistory }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState(null);
+    const [showWellnessPlan, setShowWellnessPlan] = useState(false);
 
     // Simple Mock AI Scoring Logic
     const score = useMemo(() => {
@@ -43,6 +44,43 @@ const Dashboard = ({ answers, session, onLogin }) => {
             return "You're experiencing significant emotional and cognitive pressure. While manageble, these markers point towards early signs of burnout.";
         }
         return "Your stress markers are within a managed range, though certain patterns suggest opportunity for rejuvenation and proactive self-care.";
+    }, [profileName]);
+
+    const wellnessPlan = useMemo(() => {
+        if (profileName === "Tidal Wave") {
+            return {
+                title: "Acute Reset Protocol",
+                steps: [
+                    "4-7-8 Breathing: 4 cycles, 3 times today to dampen sympathetic nervous system arousal.",
+                    "Digital Sabbatical: Complete disconnection from screens 2 hours before sleep.",
+                    "Physical Anchoring: Focus on the sensation of your feet on the ground for 2 minutes when feeling overwhelmed.",
+                    "Hydration & Nutrition: Prioritize magnesium-rich foods and consistent water intake."
+                ],
+                quote: "You can't pour from an empty cup. This is your time to refill."
+            };
+        }
+        if (profileName === "Storm Cloud") {
+            return {
+                title: "Burnout Prevention Plan",
+                steps: [
+                    "Boundaries Check: Identify one task today to say 'no' or 'not now' to.",
+                    "Gentle Movement: A 15-minute walk without headphones or distractions.",
+                    "Journaling: Spend 5 minutes writing down three things that felt heavy today.",
+                    "Social Connection: Send a short message to a trusted friend or family member."
+                ],
+                quote: "Small shifts lead to big changes. One step at a time."
+            };
+        }
+        return {
+            title: "Vitality & Growth Plan",
+            steps: [
+                "Gratitude Practice: Note one small win from today.",
+                "Mindful Morning: 5 minutes of stillness before checking your phone.",
+                "Creative Outlet: Spend 20 minutes on a hobby or interest unrelated to work.",
+                "Planning: Set one clear intention for tomorrow."
+            ],
+            quote: "Wellness is not a destination, but a way of traveling."
+        };
     }, [profileName]);
 
     const handleSaveResult = async () => {
@@ -130,12 +168,53 @@ const Dashboard = ({ answers, session, onLogin }) => {
                 <div className="glass p-8 bg-white/90 flex flex-col gap-4">
                     <ShieldCheck className="text-[var(--warm-coral)]" size={32} />
                     <h3 className="text-2xl font-bold">Next Recommended Steps</h3>
-                    <p className="text-slate-600">Based on your "{profileName}" profile, we suggest a 4-7-8 breathing exercise and a brief Digital Sabbatical tonight.</p>
-                    <button className="flex items-center gap-2 text-[var(--primary-teal)] font-bold hover:translate-x-1 transition-all mt-4">
+                    <p className="text-slate-600">Based on your "{profileName}" profile, we suggest a {profileName === 'Tidal Wave' ? '4-7-8 breathing exercise' : 'mindful movement practice'} and a brief Digital Sabbatical tonight.</p>
+                    <button
+                        onClick={() => setShowWellnessPlan(true)}
+                        className="flex items-center gap-2 text-[var(--primary-teal)] font-bold hover:translate-x-1 transition-all mt-4"
+                    >
                         Get My Wellness Plan <ArrowRight size={18} />
                     </button>
                 </div>
             </div>
+
+            {/* Wellness Plan Section */}
+            {showWellnessPlan && (
+                <div className="glass p-10 bg-gradient-to-br from-[var(--primary-teal)]/5 to-white border-2 border-[var(--primary-teal)]/30 animate-scale-in">
+                    <div className="flex justify-between items-start mb-8">
+                        <div>
+                            <div className="badge badge-teal mb-2">PERSONALIZED FOR YOU</div>
+                            <h2 className="text-3xl font-bold">{wellnessPlan.title}</h2>
+                        </div>
+                        <button
+                            onClick={() => setShowWellnessPlan(false)}
+                            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                            {wellnessPlan.steps.map((step, index) => (
+                                <div key={index} className="flex gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-[var(--primary-teal)] text-white flex-shrink-0 flex items-center justify-center font-bold">
+                                        {index + 1}
+                                    </div>
+                                    <p className="text-slate-700 font-medium leading-relaxed">{step}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="bg-white/50 p-6 rounded-2xl border border-white/50 flex flex-col justify-center items-center text-center space-y-4">
+                            <Sparkles className="text-[var(--warm-coral)]" size={40} />
+                            <p className="text-xl font-medium italic text-slate-600">"{wellnessPlan.quote}"</p>
+                            <div className="pt-4">
+                                <button className="btn btn-primary px-8">Download PDF Guide</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Login Prompt (Locked Area) */}
             {!session ? (
@@ -170,7 +249,12 @@ const Dashboard = ({ answers, session, onLogin }) => {
                                 <CheckCircle size={64} className="text-green-500 mx-auto mb-4" />
                                 <h2 className="text-3xl font-bold text-gray-800">Assessment Saved</h2>
                                 <p className="text-lg text-slate-500">Your profile is safely stored in your clinical vault. You can view your full progress dashboard now.</p>
-                                <button className="btn btn-primary mt-6 px-12">View Full History</button>
+                                <button
+                                    onClick={onViewHistory}
+                                    className="btn btn-primary mt-6 px-12"
+                                >
+                                    View Full History
+                                </button>
                             </div>
                         ) : (
                             <>

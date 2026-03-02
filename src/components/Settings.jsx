@@ -120,10 +120,10 @@ const SettingsComp = ({ session, onLogout }) => {
                         <div className="space-y-6">
                             <div className="flex items-center gap-4 py-4 border-b border-slate-100">
                                 <div className="w-20 h-20 bg-gradient-to-br from-[var(--primary-teal)] to-[var(--soft-lavender)] rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-lg">
-                                    {profile.full_name?.charAt(0).toUpperCase() || session.user.email.charAt(0).toUpperCase()}
+                                    {profile.full_name?.charAt(0).toUpperCase() || (session.user.email ? session.user.email.charAt(0).toUpperCase() : 'P')}
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold">{session.user.email}</h3>
+                                    <h3 className="text-xl font-bold">{session.user.email || session.user.phone}</h3>
                                     <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                                         <Calendar size={14} />
                                         Verified Patient since {new Date(session.user.created_at).getFullYear()}
@@ -158,7 +158,7 @@ const SettingsComp = ({ session, onLogout }) => {
                                         <label className="text-sm font-bold text-slate-500 uppercase tracking-wider">Primary Email</label>
                                         <div className="relative">
                                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                                            <input type="email" className="input-field pl-12 bg-slate-50/50 cursor-not-allowed opacity-50" value={session.user.email} disabled />
+                                            <input type="email" className="input-field pl-12 bg-slate-50/50 cursor-not-allowed opacity-50" value={session.user.email || 'N/A'} disabled />
                                         </div>
                                     </div>
                                 </div>

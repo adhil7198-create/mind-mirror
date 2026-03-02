@@ -136,7 +136,7 @@ const App = () => {
                     className={`flex items-center gap-2 font-medium transition-colors ${currentView === 'settings' ? 'text-[var(--primary-teal)] font-bold' : 'text-slate-600 hover:text-[var(--primary-teal)]'}`}
                   >
                     <Settings size={18} />
-                    <span className="text-sm font-semibold">{session.user.email.split('@')[0]}</span>
+                    <span className="text-sm font-semibold">{session.user.email ? session.user.email.split('@')[0] : (session.user.phone || 'Patient')}</span>
                   </button>
                   <button className="btn btn-secondary border-none" onClick={handleLogout}>
                     <LogOut size={18} />
@@ -276,7 +276,12 @@ const App = () => {
 
         {currentView === 'results' && assessmentAnswers && (
           <div className="container py-10 px-6">
-            <Dashboard answers={assessmentAnswers} session={session} onLogin={handleAuthModal} />
+            <Dashboard
+              answers={assessmentAnswers}
+              session={session}
+              onLogin={handleAuthModal}
+              onViewHistory={() => setCurrentView('history')}
+            />
           </div>
         )}
 
