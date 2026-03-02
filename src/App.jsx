@@ -15,11 +15,7 @@ const App = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otpCode, setOtpCode] = useState('');
   const [message, setMessage] = useState('');
-  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
-  const [showOtpInput, setShowOtpInput] = useState(false);
   const [session, setSession] = useState(null);
   const [selectedAssessment, setSelectedAssessment] = useState(null);
 
@@ -42,24 +38,11 @@ const App = () => {
     setLoading(true);
     setMessage('');
 
-    if (loginMethod === 'email') {
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) {
-        setMessage(error.message);
-      } else {
-        setMessage('Check your email for the login link!');
-      }
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) {
+      setMessage(error.message);
     } else {
-      // Phone Login
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.startsWith('+') ? phone : `+91${phone}` // Default to +91 if not provided
-      });
-      if (error) {
-        setMessage(error.message);
-      } else {
-        setShowOtpInput(true);
-        setMessage('OTP sent to your phone!');
-      }
+      setMessage('Check your email for the login link!');
     }
     setLoading(false);
   };
@@ -73,25 +56,6 @@ const App = () => {
       }
     });
     if (error) setMessage(error.message);
-    setLoading(false);
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    const { error } = await supabase.auth.verifyOtp({
-      phone: phone.startsWith('+') ? phone : `+91${phone}`,
-      token: otpCode,
-      type: 'sms'
-    });
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setIsAuthModalOpen(false);
-      setShowOtpInput(false);
-      setMessage('');
-    }
     setLoading(false);
   };
 
@@ -216,7 +180,7 @@ const App = () => {
       <main className="pt-24 min-h-screen">
         {currentView === 'landing' && (
           <div className="max-w-6xl mx-auto px-6 py-10 animate-fade-in relative">
-            <div className="md:flex items-center justify-between gap-12 py-10 md:py-20">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-12 py-10 md:py-20">
               <div className="flex-1 space-y-10">
                 <div className="badge badge-teal animate-pulse-slow">
                   <Sparkles size={14} className="inline mr-2" />
@@ -247,7 +211,7 @@ const App = () => {
                     alt="Brain Garden"
                     className="w-full rounded-2xl shadow-2xl"
                   />
-                  <div className="absolute -bottom-10 -right-10 glass p-8 animate-bounce-slow">
+                  <div className="absolute -bottom-10 -right-10 glass p-8 animate-bounce-slow hidden md:block">
                     <Heart size={48} className="text-[var(--warm-coral)] fill-[var(--warm-coral)]" />
                   </div>
                 </div>
@@ -346,109 +310,63 @@ const App = () => {
       </footer>
 
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="glass max-w-md w-full p-8 flex flex-col gap-6 bg-white/95">
-            <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-bold">{showOtpInput ? 'Verify OTP' : 'Welcome Back'}</h2>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in shadow-2xl">
+          <div className="glass max-w-md w-full p-10 flex flex-col gap-8 bg-white/95 relative overflow-hidden">
+            {/* Decorative background element scaled correctly */}
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-[var(--primary-teal)] opacity-5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="flex justify-between items-center relative z-10">
+              <h2 className="text-3xl font-bold tracking-tight">Welcome Back</h2>
               <button
                 onClick={() => { setIsAuthModalOpen(false); setShowOtpInput(false); }}
-                className="text-gray-400 hover:text-gray-600 p-2"
+                className="text-gray-400 hover:text-gray-600 p-2 transition-colors"
               >✕</button>
             </div>
 
-            {message && !showOtpInput && (
-              <div className="p-4 bg-slate-50 border border-slate-100 text-slate-600 rounded-xl text-center text-sm font-medium">
+            {message && (
+              <div className="p-4 bg-blue-50 border border-blue-100 text-blue-600 rounded-xl text-center text-sm font-medium animate-scale-in">
                 {message}
               </div>
             )}
 
-            {showOtpInput ? (
-              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-                <p className="text-slate-500 text-sm text-center">Enter the 6-digit code sent to <br /><span className="font-bold text-slate-900">{phone}</span></p>
-                <input
-                  type="text"
-                  placeholder="000000"
-                  className="input-field text-center text-2xl tracking-[1em] font-black"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  maxLength={6}
-                  required
-                />
-                <button className="btn btn-primary w-full py-4 text-xl" disabled={loading}>
-                  {loading ? 'Verifying...' : 'Verify & Continue'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowOtpInput(false)}
-                  className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
-                >
-                  Edit phone number
-                </button>
-              </form>
-            ) : (
-              <>
-                <div className="flex p-1 bg-slate-100 rounded-2xl">
-                  <button
-                    onClick={() => setLoginMethod('email')}
-                    className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMethod === 'email' ? 'bg-white shadow-sm text-[var(--primary-teal)]' : 'text-slate-400 hover:text-slate-600'}`}
-                  >Email</button>
-                  <button
-                    onClick={() => setLoginMethod('phone')}
-                    className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMethod === 'phone' ? 'bg-white shadow-sm text-[var(--primary-teal)]' : 'text-slate-400 hover:text-slate-600'}`}
-                  >Phone</button>
+            <form onSubmit={handleLogin} className="flex flex-col gap-6 relative z-10">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <input
+                    type="email"
+                    placeholder="name@example.com"
+                    className="input-field pl-12"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
+              </div>
+              <button className="btn btn-primary w-full py-4 text-xl shadow-xl shadow-[var(--primary-teal)]/20" disabled={loading}>
+                {loading ? 'Sending link...' : 'Send Magic Link'}
+              </button>
+            </form>
 
-                <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                  {loginMethod === 'email' ? (
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="input-field pl-12"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                      <input
-                        type="tel"
-                        placeholder="+91 XXX-XXX-XXXX"
-                        className="input-field pl-12"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                  )}
-                  <button className="btn btn-primary w-full py-4 text-xl" disabled={loading}>
-                    {loading ? 'Processing...' : (loginMethod === 'email' ? 'Send Magic Link' : 'Send OTP')}
-                  </button>
-                </form>
+            <div className="flex items-center gap-4 py-2 relative z-10">
+              <div className="flex-1 h-[1px] bg-slate-100"></div>
+              <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest">or continue with</span>
+              <div className="flex-1 h-[1px] bg-slate-100"></div>
+            </div>
 
-                <div className="flex items-center gap-4 py-2">
-                  <div className="flex-1 h-[1px] bg-slate-100"></div>
-                  <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest">Secured by MindMirror</span>
-                  <div className="flex-1 h-[1px] bg-slate-100"></div>
-                </div>
+            <div className="flex flex-col gap-3 relative z-10">
+              <button
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="flex items-center justify-center gap-4 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-bold text-slate-700 w-full group shadow-sm hover:shadow-md"
+              >
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google" />
+                {loading ? 'Connecting...' : 'Continue with Google'}
+              </button>
+            </div>
 
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={handleGoogleLogin}
-                    disabled={loading}
-                    className="flex items-center justify-center gap-3 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-bold text-slate-600 w-full"
-                  >
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
-                    {loading ? 'Connecting...' : 'Continue with Google'}
-                  </button>
-                </div>
-              </>
-            )}
-
-            <p className="text-center text-[11px] text-slate-400 leading-relaxed">
+            <p className="text-center text-[11px] text-slate-400 leading-relaxed relative z-10">
               By continuing, you agree to our <span className="underline cursor-pointer">Terms of Service</span> and <br /> <span className="underline cursor-pointer">Clinical Privacy Guidelines</span>.
             </p>
           </div>
