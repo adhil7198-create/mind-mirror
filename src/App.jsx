@@ -21,6 +21,7 @@ const App = () => {
   const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [session, setSession] = useState(null);
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -60,6 +61,18 @@ const App = () => {
         setMessage('OTP sent to your phone!');
       }
     }
+    setLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) setMessage(error.message);
     setLoading(false);
   };
 
@@ -287,7 +300,26 @@ const App = () => {
 
         {currentView === 'history' && session && (
           <div className="container py-10 px-6">
-            <History session={session} />
+            <History
+              session={session}
+              onView={(item) => {
+                setSelectedAssessment(item);
+                setCurrentView('view_assessment');
+              }}
+            />
+          </div>
+        )}
+
+        {currentView === 'view_assessment' && selectedAssessment && (
+          <div className="container py-10 px-6">
+            <Dashboard
+              assessmentData={selectedAssessment}
+              session={session}
+              onBack={() => {
+                setSelectedAssessment(null);
+                setCurrentView('history');
+              }}
+            />
           </div>
         )}
 
@@ -404,9 +436,13 @@ const App = () => {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <button className="flex items-center justify-center gap-3 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-bold text-slate-600">
+                  <button
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    className="flex items-center justify-center gap-3 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-bold text-slate-600 w-full"
+                  >
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
-                    Continue with Google
+                    {loading ? 'Connecting...' : 'Continue with Google'}
                   </button>
                 </div>
               </>

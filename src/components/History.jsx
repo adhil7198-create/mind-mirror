@@ -10,7 +10,7 @@ import {
     BarChart3
 } from 'lucide-react';
 
-const History = ({ session }) => {
+const History = ({ session, onView }) => {
     const [assessments, setAssessments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -130,13 +130,16 @@ const History = ({ session }) => {
 
                                     <div className="flex items-center gap-2">
                                         <button
-                                            onClick={() => deleteAssessment(item.id)}
+                                            onClick={(e) => { e.stopPropagation(); deleteAssessment(item.id); }}
                                             className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                             title="Delete Record"
                                         >
                                             <Trash2 size={20} />
                                         </button>
-                                        <button className="p-2 text-slate-300 hover:text-[var(--primary-teal)] transition-colors">
+                                        <button
+                                            onClick={() => onView(item)}
+                                            className="p-2 text-slate-300 hover:text-[var(--primary-teal)] transition-colors"
+                                        >
                                             <ChevronRight size={24} />
                                         </button>
                                     </div>

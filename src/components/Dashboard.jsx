@@ -5,15 +5,24 @@ import {
 import { ShieldCheck, Calendar, Activity, Lock, ArrowRight, UserPlus, Save, CheckCircle, Sparkles, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-const Dashboard = ({ answers, session, onLogin, onViewHistory }) => {
+const Dashboard = ({ answers, session, onLogin, onViewHistory, assessmentData, onBack }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState(null);
     const [showWellnessPlan, setShowWellnessPlan] = useState(false);
 
-    // Simple Mock AI Scoring Logic
+    // Score calculation logic
     const score = useMemo(() => {
+        if (assessmentData) {
+            return [
+                { subject: 'Physical', A: assessmentData.physical_score },
+                { subject: 'Cognitive', A: assessmentData.cognitive_score },
+                { subject: 'Emotional', A: assessmentData.emotional_score },
+                { subject: 'Social', A: assessmentData.social_score },
+            ];
+        }
+
         let physical = 40, cognitive = 50, emotional = 45, social = 30;
-        const text = Object.values(answers).join(' ').toLowerCase();
+        const text = answers ? Object.values(answers).join(' ').toLowerCase() : '';
 
         if (text.includes('racing') || text.includes('chest') || text.includes('tight')) physical += 40;
         if (text.includes('worry') || text.includes('future') || text.includes('past')) cognitive += 35;
@@ -26,17 +35,19 @@ const Dashboard = ({ answers, session, onLogin, onViewHistory }) => {
             { subject: 'Emotional', A: Math.min(emotional, 100) },
             { subject: 'Social', A: Math.min(social, 100) },
         ];
-    }, [answers]);
+    }, [answers, assessmentData]);
 
     const profileName = useMemo(() => {
+        if (assessmentData) return assessmentData.profile_name;
         const max = Math.max(...score.map(s => s.A));
         if (max > 80) return "Tidal Wave";
         if (max > 60) return "Storm Cloud";
         if (max > 40) return "Gentle Breeze";
         return "Morning Dew";
-    }, [score]);
+    }, [score, assessmentData]);
 
     const clinicalInsight = useMemo(() => {
+        if (assessmentData) return assessmentData.insight;
         if (profileName === "Tidal Wave") {
             return "Your nervous system is currently in a high-alert state. These physical and cognitive signals suggest you've crossed a functional threshold of acute stress.";
         }
@@ -44,7 +55,7 @@ const Dashboard = ({ answers, session, onLogin, onViewHistory }) => {
             return "You're experiencing significant emotional and cognitive pressure. While manageble, these markers point towards early signs of burnout.";
         }
         return "Your stress markers are within a managed range, though certain patterns suggest opportunity for rejuvenation and proactive self-care.";
-    }, [profileName]);
+    }, [profileName, assessmentData]);
 
     const wellnessPlan = useMemo(() => {
         if (profileName === "Tidal Wave") {
@@ -112,6 +123,14 @@ const Dashboard = ({ answers, session, onLogin, onViewHistory }) => {
 
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in flex flex-col gap-8">
+            {assessmentData && (
+                <button
+                    onClick={onBack}
+                    className="w-fit flex items-center gap-2 text-slate-500 hover:text-[var(--primary-teal)] font-bold transition-colors mb-2"
+                >
+                    <ArrowRight className="rotate-180" size={18} /> Back to History
+                </button>
+            )}
             {/* Quick Summary Card */}
             <div className="glass p-10 relative overflow-hidden flex flex-col md:flex-row items-center gap-10">
                 <div className="flex-1">

@@ -433,6 +433,71 @@ h5 {
   z-index: 50;
 }
 
+.z-\[60\] {
+  z-index: 60;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.bg-white\/70 {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.bg-white\/95 {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.bg-black\/60 {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -659,13 +724,9 @@ h5 {
   border-top-width: 1px;
 }
 
-.backdrop-blur-xl {
-  background: rgba(255, 255, 255, 0.98);
-}
+/* Removed legacy backdrop classes as they are now defined in utilities */
 
-.backdrop-blur-sm {
-  background: rgba(255, 255, 255, 0.95);
-}
+/* Removed legacy backdrop classes as they are now defined in utilities */
 
 .animate-pulse-slow {
   animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
